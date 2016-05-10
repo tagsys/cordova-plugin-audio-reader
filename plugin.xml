@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-audio-recorder-api"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        version="0.0.1">
+
+  <name>AudioRecorderAPI</name>
+
+  <description>
+    This plugin is a Cordova audio recorder plugin which works as API.
+  </description>
+
+  <license>MIT</license>
+
+  <engines>
+    <engine name="cordova" version=">=3.0.0"/>
+  </engines>
+
+  <js-module src="www/AudioRecorder.js" name="AudioRecorder">
+    <clobbers target="window.plugins.audioRecorder" />
+  </js-module>
+
+  <!-- ios -->
+  <!--<platform name="ios">-->
+    <!--<config-file target="config.xml" parent="/*">-->
+      <!--<feature name="AudioRecorderAPI">-->
+        <!--<param name="ios-package" value="AudioRecorderAPI"/>-->
+      <!--</feature>-->
+    <!--</config-file>-->
+    <!--<header-file src="src/ios/AudioRecorderAPI.h"/>-->
+    <!--<source-file src="src/ios/AudioRecorderAPI.m"/>-->
+  <!--</platform>-->
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="AudioRecorder">
+        <param name="android-package" value="org.tagsys.plugins.AudioRecorder" />
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+      <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    </config-file>
+    <source-file src="src/android/org/tagsys/plugins/AudioRecorder.java" target-dir="src/org/tagsys/plugins"/>
+  </platform>
+
+</plugin>
