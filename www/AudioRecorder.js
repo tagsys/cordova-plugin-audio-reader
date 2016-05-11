@@ -35,8 +35,8 @@ var DEFAULT_CONFIG = {
     source: AudioSource.MIC,
     channel: AudioChannel.CHANNEL_IN_MONO,
     format: AudioFormat.ENCODING_PCM_16BIT,
-    sampleRate:44100,
-    frameLength:0.09*44100
+    sampleRate:44100, // sample frequency
+    frameLength:0.09*44100 //the min length read from the device
 }
 
 var AudioRecorder = function(){
@@ -72,8 +72,11 @@ AudioRecorder.prototype.stop = function (successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "AudioRecorder", "stop", []);
 };
 
-AudioRecorder.prototype.read = function (successCallback, errorCallback) {
-    cordova.exec(successCallback, errorCallback, "AudioRecorder", "read", []);
+AudioRecorder.prototype.read = function (length, successCallback, errorCallback) {
+  if(!length){
+    length = 128;
+  }
+  cordova.exec(successCallback, errorCallback, "AudioRecorder", "read", [length]]);
 };
 
 AudioRecorder.install = function () {

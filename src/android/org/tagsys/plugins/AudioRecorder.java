@@ -2,28 +2,14 @@ package org.tagsys.plugins;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
-import android.media.MediaRecorder;
-import android.media.MediaPlayer;
-import android.media.AudioManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.os.CountDownTimer;
-import android.os.Environment;
 import android.content.Context;
-import java.util.UUID;
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import android.media.AudioTrack;
 import java.util.concurrent.LinkedBlockingQueue;
-
-
 
 
 public class AudioRecorder extends CordovaPlugin {
@@ -35,8 +21,7 @@ public class AudioRecorder extends CordovaPlugin {
   private int channel;
   private int format;
   private int bufferSize;
-  private int frameLength;
-  private LinkedBlockingQueue<short[]> blocks = new LinkedBlockingQueue<short[]>();
+  private LinkedBlockingQueue<Short> blocks = new LinkedBlockingQueue<Short>();
   private JSONObject result = new JSONObject();
 
   class AudioReader extends Thread{
@@ -55,13 +40,18 @@ public class AudioRecorder extends CordovaPlugin {
         }
 
         try{
-          short[] block = new short[recorder.frameLength];
-          recorder.recorder.read(block, 0, recorder.frameLength);
-          if(recorder.blocks.size() > 4096){
-            recorder.blocks.take();
+          short[] block = new short[recorder.bufferSize];
+          int number = recorder.recorder.read(block, 0, recorder.bufferSize);
+
+          if(number>0 && number <=recorder.bufferSize){
+              for(int i=0;i<number;i++){
+                //ensure no overflow
+                if(recorder.blocks.size()>10485760){
+                  recorder.blocks.take();
+                }
+                recorder.blocks.put(block[i]);
+              }
           }
-          recorder.blocks.put(block);
-          // System.out.println("push a new block:"+recorder.blocks.size());
         }catch(Exception ex){
           ex.printStackTrace();
         }
@@ -89,7 +79,7 @@ public class AudioRecorder extends CordovaPlugin {
     }
 
     if(action.equals("read")){
-        read(callbackContext);
+        read(args.getInt(0),callbackContext);
         return true;
     }
 
@@ -111,10 +101,8 @@ public class AudioRecorder extends CordovaPlugin {
 
       if(channel==AudioFormat.CHANNEL_IN_MONO){
         this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 4;
-        this.frameLength = (int)(config.getDouble("frameLength"));
       }else{
         this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT) * 4;
-        this.frameLength = (int)(config.getDouble("frameLength")*2);
       }
 
       this.recorder = new AudioRecord(source, sampleRate, channel, format, bufferSize);
@@ -153,16 +141,21 @@ public class AudioRecorder extends CordovaPlugin {
     }
   }
 
-  private void read(final CallbackContext callbackContext){
+  private void read(int length, final CallbackContext callbackContext){
 
       try{
-        short[] block = this.blocks.poll();
-        if(block!=null){
+
+        if(length<0){
+          result.put("error",-1);
+        }else if(length > blocks.size()){
+          result.put("error",1);
+        }else{
+          short[] block = new short[length];
+          for(int i=0;i<length;i++){
+              block[i] = this.blocks.take();
+          }
           result.put("error",0);
           result.put("block", block);
-        }else{
-          result.put("error",1);
-          result.put("block",null);
         }
         callbackContext.success(result);
       }catch(Exception ex){
