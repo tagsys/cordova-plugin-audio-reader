@@ -40,8 +40,6 @@ var DEFAULT_CONFIG = {
 }
 
 var AudioRecorder = function(){
-
-  console.log('new audio recorder...');
 }
 
 AudioRecorder.prototype.create = function(successCallback, errorCallback, config){
@@ -62,9 +60,9 @@ AudioRecorder.prototype.create = function(successCallback, errorCallback, config
 
 }
 
-AudioRecorder.prototype.start = function (successCallback, errorCallback, config, duration) {
+AudioRecorder.prototype.start = function (successCallback, errorCallback) {
   console.log("It is going to start.");
-  cordova.exec(successCallback, errorCallback, "AudioRecorder", "start", duration ? [duration] : []);
+  cordova.exec(successCallback, errorCallback, "AudioRecorder", "start", []);
 };
 
 AudioRecorder.prototype.stop = function (successCallback, errorCallback) {
@@ -73,10 +71,12 @@ AudioRecorder.prototype.stop = function (successCallback, errorCallback) {
 };
 
 AudioRecorder.prototype.read = function (length, successCallback, errorCallback) {
+
+  console.log("It is going to read:"+length);
   if(!length){
     length = 128;
   }
-  cordova.exec(successCallback, errorCallback, "AudioRecorder", "read", [length]]);
+  cordova.exec(successCallback, errorCallback, "AudioRecorder", "read", [length]);
 };
 
 AudioRecorder.install = function () {

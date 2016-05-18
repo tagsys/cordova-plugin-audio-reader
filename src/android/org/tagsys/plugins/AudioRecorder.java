@@ -9,7 +9,9 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.content.Context;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 
 public class AudioRecorder extends CordovaPlugin {
@@ -21,8 +23,8 @@ public class AudioRecorder extends CordovaPlugin {
   private int channel;
   private int format;
   private int bufferSize;
-  private LinkedBlockingQueue<Short> blocks = new LinkedBlockingQueue<Short>();
-  private JSONObject result = new JSONObject();
+  private LinkedBlockingDeque<Short> blocks = new LinkedBlockingDeque<Short>();
+  private short[] buffer;
 
   class AudioReader extends Thread{
     AudioRecorder recorder;
@@ -39,19 +41,22 @@ public class AudioRecorder extends CordovaPlugin {
         } catch (InterruptedException e) {
         }
 
-        try{
-          short[] block = new short[recorder.bufferSize];
-          int number = recorder.recorder.read(block, 0, recorder.bufferSize);
+        if(recorder.recorder==null){
+          return;
+        }
 
-          if(number>0 && number <=recorder.bufferSize){
-              for(int i=0;i<number;i++){
-                //ensure no overflow
-                if(recorder.blocks.size()>10485760){
-                  recorder.blocks.take();
+        try{
+            int number = recorder.recorder.read(buffer, 0, buffer.length);
+            // System.out.println(number+":"+buffer.length);
+            if(number>0 && number <=recorder.bufferSize){
+                for(int i=0;i<number;i++){
+                  //maintain 3-second data
+                  if(recorder.blocks.size()>44100*3){
+                    recorder.blocks.poll();
+                  }
+                  recorder.blocks.add(buffer[i]);
                 }
-                recorder.blocks.put(block[i]);
-              }
-          }
+            }
         }catch(Exception ex){
           ex.printStackTrace();
         }
@@ -83,13 +88,16 @@ public class AudioRecorder extends CordovaPlugin {
         return true;
     }
 
+    if(action.equals("clear")){
+      clear(callbackContext);
+      return true;
+    }
+
     return false;
   }
 
 
   private void create(String configStr,final CallbackContext callbackContext){
-
-    System.out.println("comeing to the create ufnction.");
 
     try{
       JSONObject config = new JSONObject(configStr);
@@ -97,7 +105,6 @@ public class AudioRecorder extends CordovaPlugin {
       this.sampleRate = config.getInt("sampleRate");
       this.channel = config.getInt("channel");
       this.format = config.getInt("format");
-      this.bufferSize = 0;
 
       if(channel==AudioFormat.CHANNEL_IN_MONO){
         this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 4;
@@ -106,6 +113,7 @@ public class AudioRecorder extends CordovaPlugin {
       }
 
       this.recorder = new AudioRecord(source, sampleRate, channel, format, bufferSize);
+      this.buffer = new short[bufferSize];
 
       callbackContext.success(0);
 
@@ -120,6 +128,7 @@ public class AudioRecorder extends CordovaPlugin {
     try{
       this.recorder.startRecording();
       this.stopped = false;
+      // new AudioReader(this).start();
       new AudioReader(this).start();
       callbackContext.success(0);
     }catch(Exception ex){
@@ -130,38 +139,53 @@ public class AudioRecorder extends CordovaPlugin {
 
   private void stop(final CallbackContext callbackContext){
     try{
-      this.recorder.stop();
-      this.recorder.release();
-      this.blocks.clear();
-      this.stopped = true;
-      callbackContext.success(0);
+      if(this.recorder == null){
+        this.stopped = true;
+        callbackContext.success(0);
+      }else{
+        this.recorder.stop();
+        this.recorder.release();
+        this.recorder = null;
+        this.blocks.clear();
+        this.stopped = true;
+        callbackContext.success(0);
+      }
     }catch(Exception ex){
       ex.printStackTrace();
       callbackContext.error(ex.getMessage());
     }
   }
 
-  private void read(int length, final CallbackContext callbackContext){
-
-      try{
-
-        if(length<0){
-          result.put("error",-1);
-        }else if(length > blocks.size()){
-          result.put("error",1);
-        }else{
-          short[] block = new short[length];
-          for(int i=0;i<length;i++){
-              block[i] = this.blocks.take();
-          }
-          result.put("error",0);
-          result.put("block", block);
-        }
-        callbackContext.success(result);
-      }catch(Exception ex){
-        ex.printStackTrace();
-        callbackContext.error(ex.getMessage());
-      }
+  private void clear(final CallbackContext callbackContext){
+    this.blocks.clear();
+    callbackContext.success();
   }
 
+  private void read(final int length, final CallbackContext callbackContext){
+
+    new Thread(new Runnable(){
+
+      public void run() {
+        try{
+          JSONArray block = new JSONArray();
+          for(int i=0;i<length;i++){
+            block.put(i,AudioRecorder.this.blocks.take());
+          }
+          // while (rtnBlock.length() < length) {
+          //   short[] block = AudioRecorder.this.blocks.take();
+          //   int offset = rtnBlock.length();
+          //   for (int i = 0; i < block.length; i++) {
+          //       rtnBlock.put(offset + i, block[i]);
+          //   }
+          // }
+          // System.out.println(length+":"+rtnBlock.length());
+          callbackContext.success(block);
+        }catch(Exception e){
+          e.printStackTrace();
+          callbackContext.error(e.getMessage());
+        }
+      }
+    }).start();
+
+  }
 }
