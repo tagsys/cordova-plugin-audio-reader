@@ -25,6 +25,7 @@ public class AudioRecorder extends CordovaPlugin {
   private int bufferSize;
   private LinkedBlockingDeque<Short> blocks = new LinkedBlockingDeque<Short>();
   private short[] buffer;
+  private int bufferThreshold;
 
   class AudioReader extends Thread{
     AudioRecorder recorder;
@@ -51,7 +52,7 @@ public class AudioRecorder extends CordovaPlugin {
             if(number>0 && number <=recorder.bufferSize){
                 for(int i=0;i<number;i++){
                   //maintain 3-second data
-                  if(recorder.blocks.size()>44100*3){
+                  if(recorder.blocks.size()>44100*4){
                     recorder.blocks.poll();
                   }
                   recorder.blocks.add(buffer[i]);
@@ -108,8 +109,10 @@ public class AudioRecorder extends CordovaPlugin {
 
       if(channel==AudioFormat.CHANNEL_IN_MONO){
         this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 4;
+        bufferThreshold = this.sampleRate*4;
       }else{
         this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT) * 4;
+        bufferThreshold = this.sampleRate*4*2;
       }
 
       this.recorder = new AudioRecord(source, sampleRate, channel, format, bufferSize);
