@@ -28,9 +28,9 @@ Supported Platforms
 
 # Quick Example
 
-<code>
+```js
    var audioReader = window.plugins.audioReader;
-   //with defualt configuration
+   //with defualt configuration 
    audioReader.create(null, function(){
       console.log('It is successufl to create audio reader.');
    }, function(){
@@ -50,4 +50,4 @@ Supported Platforms
       console.log('It fails to read audio data.');
    })
    
-</code>
+```
