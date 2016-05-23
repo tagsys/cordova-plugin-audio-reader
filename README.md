@@ -1,4 +1,4 @@
-# cordova-plugin-audio
+# cordova-plugin-audio-reader
 
 <hr/>
 
