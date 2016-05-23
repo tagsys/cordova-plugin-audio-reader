@@ -32,17 +32,16 @@ var AudioFormat = {
 
 /***Default config****/
 var DEFAULT_CONFIG = {
-    source: AudioSource.MIC,
-    channel: AudioChannel.CHANNEL_IN_STEREO,
+    source: AudioSource.DEFAULT,
+    channel: AudioChannel.CHANNEL_IN_MONO,
     format: AudioFormat.ENCODING_PCM_16BIT,
-    sampleRate:44100, // sample frequency
-    frameLength:0.09*44100 //the min length read from the device
+    sampleRate:44100 // sample frequency
 }
 
 var AudioRecorder = function(){
 }
 
-AudioRecorder.prototype.create = function(successCallback, errorCallback, config){
+AudioRecorder.prototype.create = function( config, successCallback, errorCallback){
 
   console.log("create AudioRecorder");
 
@@ -70,13 +69,12 @@ AudioRecorder.prototype.stop = function (successCallback, errorCallback) {
   cordova.exec(successCallback, errorCallback, "AudioRecorder", "stop", []);
 };
 
-AudioRecorder.prototype.read = function (length, successCallback, errorCallback) {
+AudioRecorder.prototype.read = function (length, channel, successCallback, errorCallback) {
 
   console.log("It is going to read:"+length);
-  if(!length){
-    length = 128;
-  }
-  cordova.exec(successCallback, errorCallback, "AudioRecorder", "read", [length]);
+  if(!length)  length = 128;
+  if(!channel) channel = 0;
+  cordova.exec(successCallback, errorCallback, "AudioRecorder", "read", [length,channel]);
 };
 
 AudioRecorder.prototype.clear = function (successCallback, errorCallback) {
