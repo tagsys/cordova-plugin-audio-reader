@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 
-public class AudioRecorder extends CordovaPlugin {
+public class AudioReader extends CordovaPlugin {
 
     private AudioRecord recorder;
     private boolean stopped;
@@ -30,54 +30,55 @@ public class AudioRecorder extends CordovaPlugin {
     private LinkedBlockingDeque<Short> rightBlocks = new LinkedBlockingDeque<Short>();
     private short[] buffer;
 
-    class AudioReader extends Thread {
-        AudioRecorder recorder;
+    class AudioReading extends Thread {
 
-        public AudioReader(AudioRecorder recorder) {
-            this.recorder = recorder;
+        AudioReader reader;
+
+        public AudioReading(AudioReader reader) {
+            this.reader = reader;
         }
 
         @Override
         public void run() {
 
-            while (recorder.stopped == false) {
+            while (reader.stopped == false) {
                 try {
                     Thread.sleep(10l);
                 } catch (InterruptedException e) {
                 }
 
-                if (recorder.recorder == null) {
+                if (reader.recorder == null) {
                     return;
                 }
 
                 try {
-                    int number = recorder.recorder.read(buffer, 0, buffer.length);
-                    if(number<=0 || number > recorder.bufferSize){
+                    int number = reader.recorder.read(buffer, 0, buffer.length);
+                    if(number<=0 || number > reader.bufferSize){
                         continue;
                     }
 
                     //single channel
-                    if(recorder.channel == AudioFormat.CHANNEL_IN_MONO){
+                    if(reader.channel == AudioFormat.CHANNEL_IN_MONO){
                         for(int i=0;i<number;i++) {
-                            if (recorder.leftBlocks.size() > recorder.sampleRate * 4) {
-                                recorder.leftBlocks.poll();
+                            if (reader.leftBlocks.size() > reader.sampleRate * 3) {
+                                reader.leftBlocks.poll();
                             }
-                            recorder.leftBlocks.add(buffer[i]);
+                            reader.leftBlocks.add(buffer[i]);
                         }
                     }
 
                     //double channels
-                    else if(recorder.channel == AudioFormat.CHANNEL_IN_STEREO){
+                    else if(reader.channel == AudioFormat.CHANNEL_IN_STEREO){
                         for(int i=0;i<number;i+=2){
-                            if(recorder.leftBlocks.size() > recorder.sampleRate*4){
-                                recorder.leftBlocks.poll();
+                            if(reader.leftBlocks.size() > reader.sampleRate*3){
+                                reader.leftBlocks.poll();
                             }
-                            recorder.leftBlocks.add(buffer[i]);
+                            reader.leftBlocks.add(buffer[i]);
 
-                            if(recorder.rightBlocks.size() > recorder.sampleRate*4){
-                                recorder.rightBlocks.poll();
+                            if(reader.rightBlocks.size() > reader.sampleRate*3){
+                                reader.rightBlocks.poll();
                             }
-                            recorder.rightBlocks.add(buffer[i+1]);
+                            reader.rightBlocks.add(buffer[i+1]);
 
                             // System.out.println(buffer[i]+":"+buffer[i+1]);
                         }
@@ -92,6 +93,7 @@ public class AudioRecorder extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
+
         Context context = cordova.getActivity().getApplicationContext();
 
         if (action.equals("create")) {
@@ -132,15 +134,11 @@ public class AudioRecorder extends CordovaPlugin {
             this.channel = config.getInt("channel");
             this.format = config.getInt("format");
 
-            System.out.println(this.channel+":"+AudioFormat.CHANNEL_IN_MONO+":"+AudioFormat.CHANNEL_IN_STEREO);
-
             if (channel == AudioFormat.CHANNEL_IN_MONO) {
                 this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
             } else if(channel == AudioFormat.CHANNEL_IN_STEREO){
                 this.bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT);
             }
-
-            System.out.println("bufferSize:"+this.bufferSize);
 
             this.recorder = new AudioRecord(source, sampleRate, channel, format, bufferSize);
             this.buffer = new short[bufferSize];
@@ -161,7 +159,7 @@ public class AudioRecorder extends CordovaPlugin {
         try {
             this.recorder.startRecording();
             this.stopped = false;
-            new AudioReader(this).start();
+            new AudioReading(this).start();
             callbackContext.success(0);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -217,17 +215,15 @@ public class AudioRecorder extends CordovaPlugin {
 
                     if(channel == 1 || channel == 0) {
                         for (int i = 0; i < length; i++) {
-                            leftBlock.put(i, AudioRecorder.this.leftBlocks.take());
+                            leftBlock.put(i, AudioReader.this.leftBlocks.take());
                         }
                     }
 
-                    if((channel == 2|| channel == 0)&&(AudioRecorder.this.channel == AudioFormat.CHANNEL_IN_STEREO)){
+                    if((channel == 2|| channel == 0)&&(AudioReader.this.channel == AudioFormat.CHANNEL_IN_STEREO)){
                         for(int i=0;i<length;i++){
-                            rightBlock.put(i, AudioRecorder.this.rightBlocks.take());
+                            rightBlock.put(i, AudioReader.this.rightBlocks.take());
                         }
                     }
-                    System.out.println("left......:"+"right.......");
-                    System.out.println(leftBlock.length()+":"+rightBlock.length());
 
                     callbackContext.success(result);
                 } catch (Exception e) {

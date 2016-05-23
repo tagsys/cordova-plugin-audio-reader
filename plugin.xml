@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="cordova-plugin-audio-recorder"
+        id="cordova-plugin-audio-reader"
         xmlns:android="http://schemas.android.com/apk/res/android"
         version="0.0.1">
 
-  <name>AudioRecorderAPI</name>
+  <name>AudioReader</name>
 
   <description>
-    This plugin is a Cordova audio recorder plugin which works as API.
+    This plugin is a Cordova audio reader which reads the raw audio from smart phone.
   </description>
 
   <license>MIT</license>
@@ -16,8 +16,8 @@
     <engine name="cordova" version=">=3.0.0"/>
   </engines>
 
-  <js-module src="www/AudioRecorder.js" name="AudioRecorder">
-    <clobbers target="window.plugins.audioRecorder" />
+  <js-module src="www/AudioReader.js" name="AudioReader">
+    <clobbers target="window.plugins.audioReader" />
   </js-module>
 
   <!-- ios -->
@@ -34,8 +34,8 @@
   <!-- android -->
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/*">
-      <feature name="AudioRecorder">
-        <param name="android-package" value="org.tagsys.plugins.AudioRecorder" />
+      <feature name="AudioReader">
+        <param name="android-package" value="org.tagsys.plugins.AudioReader" />
       </feature>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
@@ -43,7 +43,7 @@
       <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
       <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     </config-file>
-    <source-file src="src/android/org/tagsys/plugins/AudioRecorder.java" target-dir="src/org/tagsys/plugins"/>
+    <source-file src="src/android/org/tagsys/plugins/AudioReader.java" target-dir="src/org/tagsys/plugins"/>
   </platform>
 
 </plugin>

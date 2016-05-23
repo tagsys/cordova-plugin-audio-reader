@@ -1,8 +1,8 @@
 {
   "version": "0.0.6",
-  "name": "cordova-plugin-audio",
-  "cordova_name": "AudioRecorder",
-  "description": "This plugin is a Cordova audio recorder plugin which works as API.",
+  "name": "cordova-plugin-audio-reader",
+  "cordova_name": "AudioReader",
+  "description": "This plugin is a Cordova audio recorder plugin which reads raw data.",
   "license": "MIT",
   "platforms": [
     "android"
@@ -14,7 +14,7 @@
     }
   ],
   "cordova": {
-    "id": "cordova-plugin-audio",
+    "id": "cordova-plugin-audio-reader",
     "platforms": [
       "android"
     ]
