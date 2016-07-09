@@ -121,7 +121,7 @@ Starts the recording. Note that all the raw data are stored in buffer.
 ```
 
 ### audioReader.stop
-Stops the recording. 
+Stops the recording. NOTE, the audioReader should be re-initialized after the stop is called. 
 ```js
  audioReader.stop(successCallback, errorCallback)
 ```
