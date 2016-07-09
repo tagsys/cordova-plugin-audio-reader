@@ -1,5 +1,5 @@
 {
-  "version": "0.0.8",
+  "version": "0.1",
   "name": "cordova-plugin-audio-reader",
   "cordova_name": "AudioReader",
   "description": "This plugin is a Cordova audio recorder plugin which reads raw data.",
