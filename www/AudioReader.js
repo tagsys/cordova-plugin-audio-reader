@@ -43,19 +43,16 @@ var defaultConfig = {
 var audioReaderObjects = {};
 
 
-
-
 /***
  * This class provides access to the audio reader, interfaces to audio.
  *
  */
-var AudioReader = function(config, successCallback, errorCallback, statusCallback){
+var AudioReader = function(config, successCallback, errorCallback){
 
   argscheck.checkArgs('OFFF','AudioReader', arguments);
-  this.id = utils.createUUID();
   audioReaderObjects[this.id] = this;
 
-  var _config = DEFAULT_CONFIG;
+  var _config = defaultConfig;
 
   if(config){
     for (var property in config) {
@@ -63,7 +60,7 @@ var AudioReader = function(config, successCallback, errorCallback, statusCallbac
     }
   }
 
-  exec(successCallback, errorCallback, "AudioReader", "create", [this.id, _config]);
+  exec(successCallback, errorCallback, "AudioReader", "create", [_config]);
 }
 
 
