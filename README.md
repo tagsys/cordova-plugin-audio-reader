@@ -108,35 +108,48 @@ document.addEventListener('deviceready', function(){
 - <code>audioReader.start</code>: Starts the recording.
 - <code>audioReader.stop</code>: Stops the recording.
 - <code>audioReader.read</code>: Reads the raw data from audio channels.
-- <code>audioReader.clear></code>: Clears the raw data from buffers.
+- <code>audioReader.clear</code>: Clears the raw data from buffers.
 
 ### audioReader.init
 Initializes the <code>audioReader</code>
 ```js
-	audioReader.init(config, successCallback, errorCallback)
+ audioReader.init(config, successCallback, errorCallback)
 ```
 
 ### audioReader.start
 Starts the recording. Note that all the raw data are stored in buffer.
 ```js
-	audioReader.start(successCallback, errorCallback)
+ audioReader.start(successCallback, errorCallback)
 ```
 
 ### audioReader.stop
 Stops the recording. 
 ```js
-	audioReader.stop(successCallback, errorCallback)
+ audioReader.stop(successCallback, errorCallback)
 ```
 
 ### audioReader.clear
 Clears the data stored in the buffers.
 ```js
-	audioReader.clear()
+ audioReader.clear()
 ```
 
 ### audioReader.read
 Reads raw audio data from buffers. in buffer.
 ```js
-	audioReader.start(successCallback, errorCallback)
+audioReader.read(length, channel, successCallback, errorCallback)
 ```
+Parameters:
+- length: how many data do you want to read.
+- channel: which channel do you want to read from. 0 - both, 1- left channel, 2- right channel.
+- successCallback: the passed parameter contains two variables: <code>leftChannel</code> and <code>rightChannel</code>
 
+For example:
+```
+  audioReader.read(44100, 0, function(result){
+     //return an array including audio data read from left channel.
+  	 var leftArray = result.leftChannel;
+     //reutrn an array including audio data read from right channel.
+     var rightArray = result.rightChannel;
+  })
+```
