@@ -173,7 +173,6 @@ public class AudioReader extends CordovaPlugin {
                 callbackContext.success(0);
             } else {
                 this.recorder.stop();
-                this.recorder.release();
                 this.recorder = null;
                 this.leftBlocks.clear();
                 this.rightBlocks.clear();
@@ -223,7 +222,7 @@ public class AudioReader extends CordovaPlugin {
                             rightBlock.put(i, AudioReader.this.rightBlocks.take());
                         }
                     }
-                    callbackContext.success(0);
+                    callbackContext.success(result);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     callbackContext.error(ex.getMessage());
