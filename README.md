@@ -6,7 +6,7 @@ This plugin provides the ability to read raw audio data from smartphone, benefit
 NOTE: The current implementation only support Android. A future implementation will support iOS. Our plugin is different from
 
 - <code>cordova-plugin-media</code>: This plugin stores the data in a file instead of reporting to upper layer, while our plugin provides more low-level and direct access to low-level raw audio data.
-- <code>cordova-plugin-audio-recorder-api</code>: We borrow the idea from this plugin, but ours are different. This plugin still stores the audio data in a file.
+- <code>cordova-plugin-audio-recorder-api</code>: We borrow the basic idea from this plugin.However, this plugin still stores the audio data in a file.
 
 
 
