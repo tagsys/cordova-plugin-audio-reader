@@ -13,17 +13,17 @@ document.addEventListener('deviceready', function(){
 }, false)
 ```
 
-# Supported Platforms
+## Supported Platforms
 
 - [Ionic](http://ionicframework.com/) + Andriod
 
-# Installation
+## Installation
 
 ```js
 cordova plugin add cordova-plugin-audio-reader
 ```
 
-# Quick Example
+## Quick Example
 
 ```js
 
@@ -67,7 +67,7 @@ cordova plugin add cordova-plugin-audio-reader
       
 ```
 
-# Constants and Configuration
+## Constants and Configuration
 
 The following constants are used for configuration
 
