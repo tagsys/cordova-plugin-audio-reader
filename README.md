@@ -96,8 +96,8 @@ var defaultConfig = {
 You could define your own configuration as a parameter of <code>init</code> function.
 ```js
 document.addEventListener('deviceready', function(){
-        window.plugins.audioReader.init(yourConfig);
-    }, false)
+   window.plugins.audioReader.init(yourConfig);
+}, false)
 ```
 
 ## Methods
