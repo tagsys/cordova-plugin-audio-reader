@@ -103,3 +103,40 @@ document.addEventListener('deviceready', function(){
 ```
 
 ## Methods
+
+- <code>audioReader.init</code>: Initailizes the <code>audioReader</code> with customized configuration.
+- <code>audioReader.start</code>: Starts the recording.
+- <code>audioReader.stop</code>: Stops the recording.
+- <code>audioReader.read</code>: Reads the raw data from audio channels.
+- <code>audioReader.clear></code>: Clears the raw data from buffers.
+
+### audioReader.init
+Initializes the <code>audioReader</code>
+```js
+	audioReader.init(config, successCallback, errorCallback)
+```
+
+### audioReader.start
+Starts the recording. Note that all the raw data are stored in buffer.
+```js
+	audioReader.start(successCallback, errorCallback)
+```
+
+### audioReader.stop
+Stops the recording. 
+```js
+	audioReader.stop(successCallback, errorCallback)
+```
+
+### audioReader.clear
+Clears the data stored in the buffers.
+```js
+	audioReader.clear()
+```
+
+### audioReader.read
+Reads raw audio data from buffers. in buffer.
+```js
+	audioReader.start(successCallback, errorCallback)
+```
+
