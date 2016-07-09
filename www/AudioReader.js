@@ -1,11 +1,5 @@
 
-
-var argscheck = require('cordova/argscheck');
-var utils = require('cordova/utils');
-var exec = require('cordova/exec');
-
-
-//Audio source
+/**Audio Source ***/
 var AudioSource = {
   DEFAULT : 0,
   MIC : 1,
@@ -18,41 +12,36 @@ var AudioSource = {
   REMOTE_SUBMIX : 8
 }
 
-//Audio channel
+/**Channel mode***/
 var AudioChannel={
   CHANNEL_IN_MONO : 16,
   CHANNEL_IN_STEREO : 12,
 }
 
-//Audio format
+/***Audio format***/
 var AudioFormat = {
   ENCODING_PCM_16BIT : 2,
   ENCODING_PCM_8BIT : 3,
   ENCODING_PCM_FLOAT : 4
 }
 
-//default configuration
-var defaultConfig = {
+
+
+/***Default config****/
+var DEFAULT_CONFIG = {
   source: AudioSource.DEFAULT,
   channel: AudioChannel.CHANNEL_IN_MONO,
   format: AudioFormat.ENCODING_PCM_16BIT,
   sampleRate:44100 // sample frequency
 }
 
+var AudioReader = function(){
 
-var audioReaderObjects = {};
+}
 
+AudioReader.prototype.init = function( config, successCallback, errorCallback){
 
-/***
- * This class provides access to the audio reader, interfaces to audio.
- *
- */
-var AudioReader = function(config, successCallback, errorCallback){
-
-  argscheck.checkArgs('OFFF','AudioReader', arguments);
-  audioReaderObjects[this.id] = this;
-
-  var _config = defaultConfig;
+  var _config = DEFAULT_CONFIG;
 
   if(config){
     for (var property in config) {
@@ -60,57 +49,43 @@ var AudioReader = function(config, successCallback, errorCallback){
     }
   }
 
-  exec(successCallback, errorCallback, "AudioReader", "create", [_config]);
+  console.log("Audio recorder configuration:");
+
+  cordova.exec(successCallback, errorCallback, "AudioReader", "init", [_config]);
+
 }
 
-
-//"static" function to return existing objects.
-AudioReader.get = function(id){
-  return audioReaderObjects[id];
-}
-
-
-/**
- * start recording
- * @param successCallback The callback to be called when starting is successfully done.
- * @param errorCallback The callbacl to be called when starting failed.
- */
 AudioReader.prototype.start = function (successCallback, errorCallback) {
   console.log("It is going to start.");
-  exec(successCallback, errorCallback, "AudioReader", "start", []);
+  cordova.exec(successCallback, errorCallback, "AudioReader", "start", []);
 };
 
-
-AudioReader.prototype.stop = function(successCallback, errorCallback){
+AudioReader.prototype.stop = function (successCallback, errorCallback) {
   console.log("It is going to stop.");
-  exec(successCallback, errorCallback, "AudioReader", "stop", []);
-}
+  cordova.exec(successCallback, errorCallback, "AudioReader", "stop", []);
+};
 
 AudioReader.prototype.read = function (length, channel, successCallback, errorCallback) {
 
   console.log("It is going to read:"+length);
   if(!length)  length = 128;
   if(!channel) channel = 0;
-
-  exec(successCallback, errorCallback, "AudioReader", "read", [length,channel]);
+  cordova.exec(successCallback, errorCallback, "AudioReader", "read", [length,channel]);
 };
 
 AudioReader.prototype.clear = function (successCallback, errorCallback) {
 
-  exec(successCallback, errorCallback, "AudioReader", "clear",[]);
+  cordova.exec(successCallback, errorCallback, "AudioReader", "clear",[]);
 };
 
-module.exports = AudioReader;
+AudioReader.install = function () {
 
+  if (!window.plugins) {
+    window.plugins = {};
+  }
+  window.plugins.audioReader = new AudioReader();
 
-// AudioReader.install = function () {
-//
-//   if (!window.plugins) {
-//     window.plugins = {};
-//   }
-//   window.plugins.audioReader = new AudioReader();
-//
-//   return window.plugins.audioReader;
-// };
-//
-// cordova.addConstructor(AudioReader.install);
+  return window.plugins.audioReader;
+};
+
+cordova.addConstructor(AudioReader.install);

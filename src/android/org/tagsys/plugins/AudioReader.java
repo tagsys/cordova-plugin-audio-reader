@@ -96,8 +96,8 @@ public class AudioReader extends CordovaPlugin {
 
         Context context = cordova.getActivity().getApplicationContext();
 
-        if (action.equals("create")) {
-            create(args.getString(0), callbackContext);
+        if (action.equals("init")) {
+            init(args.getString(0), callbackContext);
             return true;
         }
 
@@ -125,7 +125,7 @@ public class AudioReader extends CordovaPlugin {
     }
 
 
-    private void create(String configStr, final CallbackContext callbackContext) {
+    private void init(String configStr, final CallbackContext callbackContext) {
 
         try {
             JSONObject config = new JSONObject(configStr);
@@ -144,7 +144,6 @@ public class AudioReader extends CordovaPlugin {
             this.buffer = new short[bufferSize];
 
             System.out.println("Channel count:"+this.recorder.getChannelCount());
-
 
             callbackContext.success(0);
 
@@ -190,7 +189,7 @@ public class AudioReader extends CordovaPlugin {
     private void clear(final CallbackContext callbackContext) {
         this.leftBlocks.clear();
         this.rightBlocks.clear();
-        callbackContext.success();
+        callbackContext.error(0);
     }
 
 
@@ -224,11 +223,10 @@ public class AudioReader extends CordovaPlugin {
                             rightBlock.put(i, AudioReader.this.rightBlocks.take());
                         }
                     }
-
-                    callbackContext.success(result);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    callbackContext.error(e.getMessage());
+                    callbackContext.success(0);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    callbackContext.error(ex.getMessage());
                 }
             }
         }).start();
