@@ -130,7 +130,7 @@ Stops the recording.
 
 ### audioReader.clear
 Clears the data stored in the buffers.
-```js
+```javascript
  audioReader.clear()
 ```
 
