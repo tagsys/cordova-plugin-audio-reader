@@ -33,44 +33,36 @@ document.addEventListener('deviceready', function(){
 A quick example is given as follows:
 ```js
 
-    var config = {
-    	source: AudioSource.DEFAULT,
-  		channel: AudioChannel.CHANNEL_IN_MONO,
-  		format: AudioFormat.ENCODING_PCM_16BIT,
-  		sampleRate:44100 // sample frequency
-    }
+ var config = {
+   source: AudioSource.DEFAULT,
+   channel: AudioChannel.CHANNEL_IN_MONO,
+   format: AudioFormat.ENCODING_PCM_16BIT,
+   sampleRate:44100 // sample frequency
+ }
     
-	document.addEventListener('deviceready', function(){
-        window.plugins.audioReader.init();
-    }, false)
+ document.addEventListener('deviceready', function(){
+    window.plugins.audioReader.init();
+ }, false)
 
-    $scope.start = function(){
-    
-    	windows.plugins.audioReader.start();
-    }
+ $scope.start = function(){
+   windows.plugins.audioReader.start();
+ }
    
-   $scope.stop = function(){
-   		
-        windows.plugins.audioReader.stop();
-   }
+ $scope.stop = function(){  		
+   windows.plugins.audioReader.stop();
+ }
    
-   $scope.record = function(){
-   		
-       setInterval(function(){
-       
-        	windows.plugins.audioReader.read(44100,0,function(result){
-            	var leftChannel = result.leftChannel;
-      			var rightChannel = result.rightChannel;
-                //handle the data read from left or right channel.
-                ....
-            })
-       	
-       },function(error){
-       		console.log(error)
-       },
-       1000)
+ $scope.record = function(){
+   var succes = function(result){
+   	 	var leftChannel = result.leftChannel;
+        var rightChannel = result.rightChannel;
+        //handle the data read from left or right channel.
+        ....
    }
-      
+   setInterval(function(){    
+        windows.plugins.audioReader.read(44100,0,success,null);
+   },1000)
+ }   
 ```
 
 ## Constants and Configuration
