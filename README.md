@@ -141,10 +141,10 @@ Parameters:
 
 For example:
 ```
-  audioReader.read(44100, 0, function(result){
-     //return an array including audio data read from left channel.
-  	 var leftArray = result.leftChannel;
-     //reutrn an array including audio data read from right channel.
-     var rightArray = result.rightChannel;
-  })
+ audioReader.read(44100, 0, function(result){
+    //return an array including audio data read from left channel.
+    var leftArray = result.leftChannel;
+    //reutrn an array including audio data read from right channel.
+    var rightArray = result.rightChannel;
+ })
 ```
