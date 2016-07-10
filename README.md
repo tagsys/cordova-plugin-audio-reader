@@ -39,12 +39,9 @@ A quick example is given as follows:
    format: AudioFormat.ENCODING_PCM_16BIT,
    sampleRate:44100 // sample frequency
  }
-    
- document.addEventListener('deviceready', function(){
-    window.plugins.audioReader.init();
- }, false)
 
  $scope.start = function(){
+   windows.plugins.audioReader.init(config);
    windows.plugins.audioReader.start();
  }
    
